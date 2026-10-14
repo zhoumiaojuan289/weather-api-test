@@ -6,6 +6,20 @@ import pytest
 from unittest.mock import patch,Mock
 import requests
 
+#插入fixture，模拟成功返回的响应
+@pytest.fixture
+def mock_success_response():
+    mock_response = Mock()
+    mock_response.status_code = 200
+    mock_response.json.return_value = {
+        "weatherinfo":{
+            "city":"shanghai",
+            "temp1":"25℃",
+            "temp2":"18℃",
+            "weather":"小雨"
+        }
+    }
+    return mock_response
 @patch("requests.get") #patch是根据给的路径，去替换这个位置上的对象
 def test_weather_api(mock_get):
     #1.构造一个假的服务器响应，正常返回200
@@ -58,7 +72,7 @@ def test_weather_api_timeout(mock_get):
     print(f"捕获到异常：{exc_info.value}")
     assert"请求超时" in str(exc_info.value)
 
-        #测试多个城市的正常返回，pytest.mark.parametrize装饰器:用一组数据自动炮多个测试。
+    #4.测试多个城市的正常返回，pytest.mark.parametrize装饰器:用一组数据自动炮多个测试。
 @pytest.mark.parametrize("city,temp1,temp2,weather",[
     ("beijing","20℃","10℃","多云"),
     ("shanghai","25℃","18℃","小雨"),
@@ -92,4 +106,15 @@ def test_weather_multiple_cities(mock_get,city,temp1,temp2,weather):
     print(f"最低温:{weather_info.get('temp2')}")
     assert weather_info["temp2"] == temp2
         
+#5.测试5：用fixture复用mock响应
+@patch("requests.get")
+def test_weather_api_fixture(mock_get,mock_success_response):
+    mock_get.return_value = mock_success_response
 
+    response = requests.get("http://any-url.com")
+    assert response.status_code == 200
+
+    weather_info = response.json().get("weatherinfo")
+    print(f"城市：{weather_info.get('city')}")
+    assert weather_info["city"] == "shanghai"
+    assert weather_info["temp1"] == "25℃"
