@@ -55,5 +55,41 @@ def test_weather_api_timeout(mock_get):
     with pytest.raises(requests.exceptions.Timeout) as exc_info:
         requests.get("any-url.com")
 
-        print(f"捕获到异常：{exc_info.value}")
-        assert"请求超时" in str(exc_info.value)
+    print(f"捕获到异常：{exc_info.value}")
+    assert"请求超时" in str(exc_info.value)
+
+        #测试多个城市的正常返回，pytest.mark.parametrize装饰器:用一组数据自动炮多个测试。
+@pytest.mark.parametrize("city,temp1,temp2,weather",[
+    ("beijing","20℃","10℃","多云"),
+    ("shanghai","25℃","18℃","小雨"),
+    ("London","15℃","8℃","阴天"),
+    ("NewYork","30℃","20℃","晴天"),
+    ])
+@patch("requests.get")
+def test_weather_multiple_cities(mock_get,city,temp1,temp2,weather):
+    mock_response = Mock()
+    mock_response.status_code = 200
+    mock_response.json.return_value = {
+        "weatherinfo":{
+            "city":city,
+            "temp1":temp1,
+            "temp2":temp2,
+            "weather":weather
+        }
+    }
+    mock_get.return_value = mock_response
+
+    response = requests.get("http://any-url.com")
+    assert response.status_code == 200 
+
+    data = response.json()
+    weather_info = data.get("weatherinfo")
+
+    print(f"城市：{weather_info.get('city')}")
+    assert weather_info["city"] == city
+    print(f"最高温：{weather_info.get('temp1')}")
+    assert weather_info["temp1"] == temp1
+    print(f"最低温:{weather_info.get('temp2')}")
+    assert weather_info["temp2"] == temp2
+        
+
