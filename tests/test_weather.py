@@ -7,19 +7,20 @@ from unittest.mock import patch,Mock
 import requests
 
 #插入fixture，模拟成功返回的响应
-@pytest.fixture
-def mock_success_response():
-    mock_response = Mock()
-    mock_response.status_code = 200
-    mock_response.json.return_value = {
-        "weatherinfo":{
-            "city":"shanghai",
-            "temp1":"25℃",
-            "temp2":"18℃",
-            "weather":"小雨"
-        }
-    }
-    return mock_response
+#@pytest.fixture
+#def mock_success_response():
+ 
+#   mock_response = Mock()
+#   mock_response.status_code = 200
+#   mock_response.json.return_value = {
+#        "weatherinfo":{
+#            "city":"shanghai",
+#            "temp1":"25℃",
+#            "temp2":"18℃",
+#            "weather":"小雨"
+#        }
+#    }
+#    return mock_response
 @patch("requests.get") #patch是根据给的路径，去替换这个位置上的对象
 def test_weather_api(mock_get):
     #1.构造一个假的服务器响应，正常返回200
