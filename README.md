@@ -18,7 +18,8 @@ python -m pytest test_weather.py -v -s
 - 请求超时异常
 - 使用 parametrize 覆盖多城市数据驱动测试（北京、上海、伦敦、纽约）
 - 添加 fixture 复用 mock 响应
+- 添加conftest.py文件，抽取公共fixture
 
 ## 说明
 使用 mock 实现无网络依赖的稳定测试
-项目结构清晰，覆盖正常、失败、异常三类场景，并通过 parametrize 实现数据驱动，通过fixture实现 代码复用。
+项目结构清晰，覆盖正常、失败、异常三类场景，并通过 parametrize 实现数据驱动，通过fixture实现 代码复用（添加conftest.py文件，抽取公共fixture）。
